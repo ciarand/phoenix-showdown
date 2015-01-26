@@ -13,7 +13,7 @@ to what Phoenix looks like at the moment (at least to me).
 
 While I didn't expect the performance to match Elixir/Phoenix, I was curious
 what would happen if I dropped those same ERB templates in a minimal Sinatra app
-instead of a Rails one.  
+instead of a Rails one.
 
 And heck, while I was there, since Express is essentially Sinatra for Node, why
 not do a quick port over there for comparison too...
@@ -84,10 +84,16 @@ wanted this to be a closer comparison.  Pull requests welcome if you care!
 
 
 ## Benchmarking
-Machine: iMac Intel Core i7 (3.4 GHz 4 Cores) 12 GB RAM
+All non-Go benchmarks were performed on:
 
-All benchmarks run on a local dev machine are highly suspect.  If you want
-more scientific these should really be done in a production server environment.
+- iMac Intel Core i7 (3.4 GHz 4 Cores) 12 GB RAM
+
+The Go benchmarks were performed on:
+
+- 2010 MacBook Pro (2.2 GHz 4 cores) 16 GB RAM
+
+All benchmarks run on a local dev machine are highly suspect. If you want more
+scientific these should really be done in a production server environment.
 
 ### Benchmarking Phoenix
 Elixir 0.14.2
@@ -208,7 +214,7 @@ Transfer/sec:     38.33MB
 ```
 
 ### Benchmarking Martini
-Go 1.3
+Go 1.4
 
 ```bash
 $ go get github.com/go-martini/martini
@@ -220,12 +226,31 @@ $ wrk -t4 -c100 -d30S --timeout 2000 "http://127.0.0.1:3000/showdown"
 Running 30s test @ http://127.0.0.1:3000/showdown
   4 threads and 100 connections
   Thread Stats   Avg      Stdev     Max   +/- Stdev
-    Latency     7.62ms    3.84ms  55.34ms   82.38%
-    Req/Sec     3.36k   261.43     4.59k    71.54%
-  394469 requests in 30.00s, 785.12MB read
-Requests/sec:  13148.48
-Transfer/sec:     26.17MB
+    Latency    11.42ms   16.65ms 206.02ms   89.20%
+    Req/Sec     2.21k   287.33     3.27k    69.04%
+  261899 requests in 30.00s, 521.26MB read
+Requests/sec:   8730.08
+Transfer/sec:     17.38MB
 ```
+
+### Benchmarking Gin
+Go 1.4
+
+```bash
+$ go get github.com/gin-gonic/gin
+$ GOMAXPROCS=4 GIN_MODE=release go run server.go
+
+$ wrk -t4 -c100 -d30S --timeout 2000 "http://127.0.0.1:3000/showdown"
+Running 30s test @ http://127.0.0.1:3000/showdown
+  4 threads and 100 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency     4.62ms  650.23us  10.85ms   62.47%
+    Req/Sec     5.77k   766.66     8.56k    62.06%
+  655093 requests in 30.00s, 1.27GB read
+Requests/sec:  21836.91
+Transfer/sec:     43.27MB
+```
+
 
 ### Comparative Benchmark Numbers
 
@@ -233,12 +258,14 @@ Transfer/sec:     26.17MB
 | :------------- | :----------------- | :----------- | :----------------- |
 | Phoenix        |          22294.75  |        4.54  |              1.75  |
 | Express Cluster|          18427.80  |        6.62  |              7.26  |
-| Martini        |          13148.48  |        7.62  |              3.84  |
 | Sinatra        |           6657.98  |        8.80  |              4.16  |
 | Express        |           6330.13  |       15.89  |              1.70  |
 | Rails          |           2275.33  |       15.78  |             12.94  |
 
-
+|                | Throughput (req/s) | Latency (ms) | Consistency (σ ms) |
+| :------------- | :----------------- | :----------- | :----------------- |
+| Martini        |           8730.08  |       11.42  |             16.65  |
+| Gin            |          21836.91  |        4.62  |              0.650 |
 
 ## Conclusions
 The only benchmarks that _really_ matter are the ones that apply to your own
