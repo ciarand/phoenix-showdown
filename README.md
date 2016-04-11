@@ -1,3 +1,5 @@
+This project is deprecated and unmaintained. Proceed with caution!
+
 # Benchmarking Phoenix vs Rails vs Sinatra vs Express vs Martini...
 
 I was curious about [Chris McCord's Phoenix vs Rails article][original] -- if
